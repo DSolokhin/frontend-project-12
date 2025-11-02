@@ -1,14 +1,12 @@
 {
   "name": "@hexlet/code",
-  "version": "1.0.0",
-  "scripts": {
-    "build": "cd frontend && npm run build",
-    "start": "npx start-server -s ./frontend/dist",
-    "dev": "cd frontend && npm run dev"
-  },
+  "version": "0.0.1",
   "description": "[![Actions Status](https://github.com/DSolokhin/frontend-project-12/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/DSolokhin/frontend-project-12/actions)",
-  "main": "index.js",
+  "type": "module",
   "scripts": {
+    "build": "cd frontend && npm install && npm run build",
+    "start": "npx start-server -s ./frontend/dist",
+    "dev": "cd frontend && npm run dev",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -18,7 +16,6 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
   "bugs": {
     "url": "https://github.com/DSolokhin/frontend-project-12/issues"
   },
@@ -27,3 +24,4 @@
     "@hexlet/chat-server": "^2.0.4"
   }
 }
+
