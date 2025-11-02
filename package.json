@@ -1,6 +1,11 @@
 {
   "name": "@hexlet/code",
   "version": "1.0.0",
+  "scripts": {
+    "build": "cd frontend && npm run build",
+    "start": "npx start-server -s ./frontend/dist",
+    "dev": "cd frontend && npm run dev"
+  },
   "description": "[![Actions Status](https://github.com/DSolokhin/frontend-project-12/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/DSolokhin/frontend-project-12/actions)",
   "main": "index.js",
   "scripts": {
