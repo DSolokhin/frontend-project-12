@@ -4,12 +4,12 @@ export const chatApi = createApi({
   reducerPath: 'chatApi',
   baseQuery: fetchBaseQuery({
     baseUrl: '/api/v1/',
-    prepareHeaders: (headers, { getState }) => {
-      const token = getState().auth.token
+    prepareHeaders: (headers) => {
+      const token = localStorage.getItem('token');
       if (token) {
-        headers.set('authorization', `Bearer ${token}`)
+        headers.set('authorization', `Bearer ${token}`);
       }
-      return headers
+      return headers;
     },
   }),
   tagTypes: ['Channels', 'Messages'],
@@ -25,7 +25,4 @@ export const chatApi = createApi({
   }),
 })
 
-export const {
-  useGetChannelsQuery,
-  useGetMessagesQuery,
-} = chatApi
+export const { useGetChannelsQuery, useGetMessagesQuery } = chatApi

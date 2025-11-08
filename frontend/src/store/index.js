@@ -9,10 +9,8 @@ export const store = configureStore({
     auth: authReducer,
     channels: channelsReducer,
     messages: messagesReducer,
-    // Добавляем редюсер RTK Query
     [chatApi.reducerPath]: chatApi.reducer,
   },
-  // Добавляем middleware RTK Query
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(chatApi.middleware),
 })

@@ -1,8 +1,8 @@
-import React from 'react'
+// App.jsx
+import React, { useEffect } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
-import { Provider, useSelector } from 'react-redux'
-import { store } from './store'
-import { selectIsAuthenticated } from './store/slices/authSlice'
+import { useDispatch, useSelector } from 'react-redux'
+import { selectIsAuthenticated, initializeAuth } from './store/slices/authSlice'
 import ChatPage from './components/ChatPage'
 import LoginPage from './components/LoginPage'
 import NotFoundPage from './components/NotFoundPage'
@@ -14,23 +14,29 @@ const PrivateRoute = ({ children }) => {
 }
 
 function App() {
+  const dispatch = useDispatch()
+
+  // Инициализируем авторизацию при загрузке приложения
+  useEffect(() => {
+    console.log('🔐 [App] Initializing auth from localStorage...')
+    dispatch(initializeAuth())
+  }, [dispatch])
+
   return (
-    <Provider store={store}>
-      <div className="App">
-        <Routes>
-          <Route 
-            path="/" 
-            element={
-              <PrivateRoute>
-                <ChatPage />
-              </PrivateRoute>
-            } 
-          />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="*" element={<NotFoundPage />} />
-        </Routes>
-      </div>
-    </Provider>
+    <div className="App">
+      <Routes>
+        <Route 
+          path="/" 
+          element={
+            <PrivateRoute>
+              <ChatPage />
+            </PrivateRoute>
+          } 
+        />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+    </div>
   )
 }
 
