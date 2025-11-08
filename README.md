@@ -3,4 +3,4 @@
 
 ## Live Demo
 
-🔗 **Production**: https://frontend-chat-ds.onrender.com/
+🔗 **Production**: https://chat-ds.onrender.com
