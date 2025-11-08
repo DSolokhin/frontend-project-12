@@ -1,16 +1,17 @@
 install:
-	npm ci
-
-start:
-	npx start-server -s ./frontend/dist
-
-develop:
-	make start & cd frontend && npm run dev
+	cd frontend && npm ci
 
 build:
-	npm run build
+	cd frontend && npm ci && npm run build
+
+start:
+	FASTIFY_ADDRESS=0.0.0.0 npx start-server -s ./frontend/dist -p 10000
+
+dev:
+	cd frontend && npm run dev
 
 lint:
 	cd frontend && npm run lint
 
-.PHONY: install start develop build lint
+.PHONY: install build start dev lint
+
