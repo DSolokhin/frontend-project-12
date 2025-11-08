@@ -7,19 +7,31 @@ const port = process.env.PORT || 10000;
 
 process.env.FASTIFY_ADDRESS = '0.0.0.0';
 
-console.log('=== Starting Server ===');
+console.log('=== Starting SPA Server ===');
 console.log('Port:', port);
 console.log('Static path:', staticPath);
 
-// Проверяем что dist существует
-if (existsSync(staticPath)) {
-  console.log('✓ dist folder exists');
-  const files = require('fs').readdirSync(staticPath);
-  console.log('Files:', files);
-} else {
-  console.error('✗ dist folder not found!');
-  process.exit(1);
-}
+// Используем Fastify для SPA роутинга
+const fastify = require('fastify')({
+  logger: true
+});
 
-// Запускаем стандартный сервер
-createServer(staticPath, port);
+// Обслуживаем статические файлы
+fastify.register(require('@fastify/static'), {
+  root: staticPath,
+  prefix: '/',
+});
+
+// SPA fallback - все маршруты ведут на index.html
+fastify.setNotFoundHandler((request, reply) => {
+  reply.sendFile('index.html');
+});
+
+// Запускаем сервер
+fastify.listen({ port, host: '0.0.0.0' }, (err, address) => {
+  if (err) {
+    fastify.log.error(err);
+    process.exit(1);
+  }
+  console.log(`Server listening on ${address}`);
+});
