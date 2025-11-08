@@ -6,6 +6,15 @@ export default defineConfig({
   esbuild: {
     loader: 'jsx'
   },
+  base: './',
+  build: {
+    outDir: 'dist',
+    rollupOptions: {
+      input: {
+        main: './index.html'
+      }
+    }
+  },
   server: {
     proxy: {
       '/api': {
