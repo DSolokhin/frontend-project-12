@@ -11,4 +11,9 @@ export default defineConfig({
       },
     },
   },
+  define: {
+    __API_URL__: process.env.NODE_ENV === 'production'
+      ? 'https://chat-ds.onrender.com'
+      : 'http://localhost:5001',
+  },
 })

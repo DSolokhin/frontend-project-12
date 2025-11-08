@@ -4,4 +4,4 @@ build:
 	cp -r frontend/dist ./dist
 
 start:
-	FASTIFY_ADDRESS=0.0.0.0 npx start-server -s ./dist -p $${PORT:-5000} --demo
+	FASTIFY_ADDRESS=0.0.0.0 npx start-server -s ./dist -p $${PORT:-5000}
