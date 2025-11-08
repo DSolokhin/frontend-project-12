@@ -1,12 +1,13 @@
 import React, { useState } from 'react'
 import { Formik, Form, Field, ErrorMessage } from 'formik'
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../contexts/AuthContext'
+import { useDispatch } from 'react-redux'
+import { setCredentials } from '../store/slices/authSlice'
 import axios from 'axios'
 
 const LoginPage = () => {
   const navigate = useNavigate()
-  const { login } = useAuth()
+  const dispatch = useDispatch()
   const [authError, setAuthError] = useState('')
 
   const handleSubmit = async (values, { setSubmitting }) => {
@@ -19,10 +20,10 @@ const LoginPage = () => {
         await new Promise(resolve => setTimeout(resolve, 500))
         
         if (values.username === 'admin' && values.password === 'admin') {
-          login({
-            username: 'admin',
+          dispatch(setCredentials({
+            user: { username: 'admin' },
             token: 'demo-token-' + Date.now()
-          })
+          }))
           navigate('/')
           return
         } else {
@@ -38,10 +39,10 @@ const LoginPage = () => {
       })
 
       if (response.data && response.data.token) {
-        login({
-          username: response.data.username,
+        dispatch(setCredentials({
+          user: { username: response.data.username },
           token: response.data.token
-        })
+        }))
         navigate('/')
       } else {
         setAuthError('Ошибка сервера: неверный ответ')
