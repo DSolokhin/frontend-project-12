@@ -13,12 +13,30 @@ const LoginPage = () => {
     try {
       setAuthError('')
       
+      // Демо-режим для продакшена (Render)
+      if (window.location.hostname.includes('render.com') || import.meta.env.PROD) {
+        // Имитируем задержку сервера
+        await new Promise(resolve => setTimeout(resolve, 500))
+        
+        if (values.username === 'admin' && values.password === 'admin') {
+          login({
+            username: 'admin',
+            token: 'demo-token-' + Date.now()
+          })
+          navigate('/')
+          return
+        } else {
+          setAuthError('Неверное имя пользователя или пароль')
+          return
+        }
+      }
+
+      // Оригинальный код для локальной разработки
       const response = await axios.post('/api/v1/login', {
         username: values.username,
         password: values.password
       })
 
-      // Проверяем что ответ содержит токен
       if (response.data && response.data.token) {
         login({
           username: response.data.username,
