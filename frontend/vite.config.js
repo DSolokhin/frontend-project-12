@@ -6,14 +6,14 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:5001',
+        target: 'http://localhost:5001', // dev сервер
         changeOrigin: true,
       },
     },
   },
   define: {
     __API_URL__: process.env.NODE_ENV === 'production'
-      ? 'https://chat-ds.onrender.com'
-      : 'http://localhost:5001',
+      ? '"https://chat-ds.onrender.com"'
+      : '"http://localhost:5001"',
   },
 })
