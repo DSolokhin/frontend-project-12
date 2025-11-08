@@ -12,16 +12,14 @@
   },
   "license": "ISC",
   "author": "",
-  "type": "module",
+  "type": "commonjs",
   "scripts": {
     "build": "cd frontend && npm ci && npm run build",
-    "start": "node server.js",
+    "start": "FASTIFY_ADDRESS=0.0.0.0 npx start-server -s ./frontend/dist -p 10000",
     "dev": "cd frontend && npm run dev",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@hexlet/chat-server": "^2.0.4",
-    "fastify": "^4.28.1",
-    "@fastify/static": "^7.0.4"
+    "@hexlet/chat-server": "^2.0.4"
   }
 }
