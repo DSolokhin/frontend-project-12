@@ -1,10 +1,36 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Formik, Form, Field, ErrorMessage } from 'formik'
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../contexts/AuthContext'
+import axios from 'axios'
 
 const LoginPage = () => {
-  const handleSubmit = (values) => {
-    console.log('Форма отправлена:', values)
-    // Здесь будет логика авторизации
+  const navigate = useNavigate()
+  const { login } = useAuth()
+  const [authError, setAuthError] = useState('')
+
+  const handleSubmit = async (values, { setSubmitting }) => {
+    try {
+      setAuthError('')
+      
+      const response = await axios.post('/api/v1/login', {
+        username: values.username,
+        password: values.password
+      })
+
+      login({
+        username: response.data.username,
+        token: response.data.token
+      })
+
+      navigate('/')
+      
+    } catch (error) {
+      console.error('Login error:', error)
+      setAuthError('Неверное имя пользователя или пароль')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   const validate = (values) => {
@@ -21,6 +47,13 @@ const LoginPage = () => {
   return (
     <div className="login-page">
       <h1>Авторизация</h1>
+      
+      {authError && (
+        <div className="auth-error">
+          {authError}
+        </div>
+      )}
+
       <Formik
         initialValues={{ username: '', password: '' }}
         validate={validate}
@@ -51,11 +84,17 @@ const LoginPage = () => {
             </div>
 
             <button type="submit" disabled={isSubmitting}>
-              Войти
+              {isSubmitting ? 'Вход...' : 'Войти'}
             </button>
           </Form>
         )}
       </Formik>
+
+      <div className="test-credentials">
+        <p><strong>Тестовые данные:</strong></p>
+        <p>Имя пользователя: <code>admin</code></p>
+        <p>Пароль: <code>admin</code></p>
+      </div>
     </div>
   )
 }
