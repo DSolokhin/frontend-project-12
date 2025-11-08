@@ -12,59 +12,31 @@ const ChatPage = () => {
   const currentChannelId = useSelector(selectCurrentChannelId)
   const messages = useSelector(selectMessages)
 
-  // Демо-данные для продакшена
-  const demoChannels = [
-    { id: 1, name: 'general', removable: false },
-    { id: 2, name: 'random', removable: false },
-  ]
-
-  const demoMessages = [
-    { id: 1, body: 'Добро пожаловать в Hexlet Chat!', channelId: 1, username: 'admin' },
-    { id: 2, body: 'Это демо-режим на Render', channelId: 1, username: 'admin' },
-    { id: 3, body: 'Здесь можно тестировать интерфейс', channelId: 1, username: 'admin' },
-    { id: 4, body: 'Привет! Как дела?', channelId: 2, username: 'user' },
-    { id: 5, body: 'Всё отлично!', channelId: 2, username: 'admin' },
-  ]
-
-  // Загружаем данные с помощью RTK Query (для локальной разработки)
+  // Загружаем данные с помощью RTK Query
   const { 
     data: channelsData, 
     isLoading: channelsLoading,
     error: channelsError 
-  } = useGetChannelsQuery(undefined, {
-    skip: window.location.hostname.includes('render.com') || import.meta.env.PROD
-  })
+  } = useGetChannelsQuery()
 
   const { 
     data: messagesData, 
     isLoading: messagesLoading,
     error: messagesError 
-  } = useGetMessagesQuery(undefined, {
-    skip: window.location.hostname.includes('render.com') || import.meta.env.PROD
-  })
+  } = useGetMessagesQuery()
 
   // Сохраняем данные в Redux store
   useEffect(() => {
-    if (window.location.hostname.includes('render.com') || import.meta.env.PROD) {
-      // Демо-режим для продакшена
-      dispatch(setChannels(demoChannels))
-      dispatch(setMessages(demoMessages))
-      if (!currentChannelId) {
-        dispatch(setCurrentChannel(1))
-      }
-    } else {
-      // Оригинальный код для локальной разработки
-      if (channelsData) {
-        dispatch(setChannels(channelsData))
-        if (channelsData.length > 0 && !currentChannelId) {
-          dispatch(setCurrentChannel(channelsData[0].id))
-        }
+    if (channelsData) {
+      dispatch(setChannels(channelsData))
+      if (channelsData.length > 0 && !currentChannelId) {
+        dispatch(setCurrentChannel(channelsData[0].id))
       }
     }
   }, [channelsData, dispatch, currentChannelId])
 
   useEffect(() => {
-    if (!window.location.hostname.includes('render.com') && !import.meta.env.PROD && messagesData) {
+    if (messagesData) {
       dispatch(setMessages(messagesData))
     }
   }, [messagesData, dispatch])
@@ -77,8 +49,8 @@ const ChatPage = () => {
     dispatch(setCurrentChannel(channelId))
   }
 
-  // Обработка ошибок загрузки (только для локальной разработки)
-  if (!window.location.hostname.includes('render.com') && !import.meta.env.PROD && (channelsError || messagesError)) {
+  // Обработка ошибок загрузки
+  if (channelsError || messagesError) {
     return (
       <div className="chat-page">
         <div className="error-message">
@@ -90,8 +62,8 @@ const ChatPage = () => {
     )
   }
 
-  // Загрузка (только для локальной разработки)
-  if (!window.location.hostname.includes('render.com') && !import.meta.env.PROD && (channelsLoading || messagesLoading)) {
+  // Загрузка
+  if (channelsLoading || messagesLoading) {
     return (
       <div className="chat-page">
         <div className="loading">Загрузка чата...</div>
