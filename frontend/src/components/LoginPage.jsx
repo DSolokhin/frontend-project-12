@@ -91,7 +91,7 @@ const LoginPage = () => {
           <Card className="shadow">
             <Card.Body className="p-4">
               <div className="text-center mb-4">
-                <h1 className="h3">Hexlet Chat</h1>
+                <h1 className="h3">DS Chat</h1>
                 <p className="text-muted">Войдите в свой аккаунт</p>
               </div>
               
