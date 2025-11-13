@@ -70,7 +70,7 @@ const ChatPage = () => {
       <div className="d-flex flex-column vh-100">
         <Navbar bg="primary" variant="dark" expand="lg">
           <Container>
-            <Navbar.Brand href="#">Hexlet Chat</Navbar.Brand>
+            <Navbar.Brand href="#">DS Chat</Navbar.Brand>
           </Container>
         </Navbar>
         <Container className="d-flex align-items-center justify-content-center flex-grow-1">
@@ -91,7 +91,7 @@ const ChatPage = () => {
       {/* Навбар */}
       <Navbar bg="primary" variant="dark" expand="lg">
         <Container>
-          <Navbar.Brand href="#">Hexlet Chat</Navbar.Brand>
+          <Navbar.Brand href="#">DS Chat</Navbar.Brand>
           <Navbar.Toggle />
           <Navbar.Collapse className="justify-content-end">
             <Navbar.Text className="me-3">
