@@ -1,3 +1,4 @@
+// store/api/chatApi.js
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
 export const chatApi = createApi({
@@ -22,7 +23,20 @@ export const chatApi = createApi({
       query: () => 'messages',
       providesTags: ['Messages'],
     }),
+    // ДОБАВЛЯЕМ ОТПРАВКУ СООБЩЕНИЙ
+    sendMessage: builder.mutation({
+      query: (message) => ({
+        url: 'messages',
+        method: 'POST',
+        body: message,
+      }),
+      invalidatesTags: ['Messages'],
+    }),
   }),
 })
 
-export const { useGetChannelsQuery, useGetMessagesQuery } = chatApi
+export const { 
+  useGetChannelsQuery, 
+  useGetMessagesQuery,
+  useSendMessageMutation // ДОБАВЛЯЕМ ЭКСПОРТ
+} = chatApi

@@ -5,12 +5,19 @@ import { useDispatch, useSelector } from 'react-redux'
 import { selectIsAuthenticated, initializeAuth } from './store/slices/authSlice'
 import ChatPage from './components/ChatPage'
 import LoginPage from './components/LoginPage'
+import RegistrationPage from './components/RegistrationPage' // Добавляем импорт
 import NotFoundPage from './components/NotFoundPage'
 import './App.css'
 
 const PrivateRoute = ({ children }) => {
   const isAuthenticated = useSelector(selectIsAuthenticated)
   return isAuthenticated ? children : <Navigate to="/login" />
+}
+
+// Компонент для редиректа авторизованных пользователей
+const PublicRoute = ({ children }) => {
+  const isAuthenticated = useSelector(selectIsAuthenticated)
+  return !isAuthenticated ? children : <Navigate to="/" />
 }
 
 function App() {
@@ -33,7 +40,22 @@ function App() {
             </PrivateRoute>
           } 
         />
-        <Route path="/login" element={<LoginPage />} />
+        <Route 
+          path="/login" 
+          element={
+            <PublicRoute>
+              <LoginPage />
+            </PublicRoute>
+          } 
+        />
+        <Route 
+          path="/register" 
+          element={
+            <PublicRoute>
+              <RegistrationPage />
+            </PublicRoute>
+          } 
+        />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </div>
