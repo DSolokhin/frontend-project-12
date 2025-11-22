@@ -1,9 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout, selectCurrentUser } from '../store/slices/authSlice';
-import { 
-  Container, Navbar, Button, Card, ListGroup, Form, InputGroup, 
-  Alert, Spinner, Dropdown 
+import {
+  Container,
+  Navbar,
+  Button,
+  Form,
+  InputGroup,
+  Alert,
+  Spinner
 } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import { useApi } from '../hooks/index.jsx';
@@ -19,18 +24,18 @@ const ChatPage = () => {
   const dispatch = useDispatch();
   const api = useApi();
   const user = useSelector(selectCurrentUser);
-  
+
   const channels = useSelector(channelsSelectors.allChannels);
   const currentChannel = useSelector(channelsSelectors.currentChannel);
   const currentMessages = useSelector(messagesSelectors.currentChannelMessages);
-  
+
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  
+
   const messageInputRef = useRef(null);
   const messagesEndRef = useRef(null);
-  
+
   const [showAddModal, setShowAddModal] = useState(false);
   const [showRenameModal, setShowRenameModal] = useState(false);
   const [showRemoveModal, setShowRemoveModal] = useState(false);
@@ -40,31 +45,29 @@ const ChatPage = () => {
     const loadInitialData = async () => {
       try {
         const token = localStorage.getItem('token');
-        
+
         const [channelsResponse, messagesResponse] = await Promise.all([
           fetch('/api/v1/channels', {
-            headers: { 
-              'Authorization': `Bearer ${token}`,
-              'Cache-Control': 'no-cache'
-            }
+            headers: { Authorization: `Bearer ${token}`, 'Cache-Control': 'no-cache' }
           }),
           fetch('/api/v1/messages', {
-            headers: { 
-              'Authorization': `Bearer ${token}`,
-              'Cache-Control': 'no-cache'
-            }
+            headers: { Authorization: `Bearer ${token}`, 'Cache-Control': 'no-cache' }
           })
         ]);
-        
+
         if (!channelsResponse.ok) throw new Error('Channels load failed');
         if (!messagesResponse.ok) throw new Error('Messages load failed');
-        
+
         const channelsData = await channelsResponse.json();
         const messagesData = await messagesResponse.json();
-        
+
         dispatch(channelsActions.addChannels(channelsData));
         dispatch(messagesActions.addMessages(messagesData));
-        
+
+        // Автовыбор канала #general
+        if (channelsData.length > 0) {
+          dispatch(channelsActions.changeChannel(channelsData[0].id));
+        }
       } catch (err) {
         console.error('❌ Load error:', err);
         setError('Ошибка загрузки данных');
@@ -77,32 +80,27 @@ const ChatPage = () => {
     loadInitialData();
   }, [dispatch]);
 
+  useEffect(() => {
+    // Скролл к последнему сообщению
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [currentMessages, currentChannel]);
+
   const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!newMessage.trim() || !currentChannel) return;
-    
+
     try {
-      const result = await api.addMessage(
-        newMessage.trim(),
-        currentChannel.id,
-        user?.username
-      );
-      
-      if (result) {
-        dispatch(messagesActions.addMessage(result));
-      }
-      
+      const result = await api.addMessage(newMessage.trim(), currentChannel.id, user?.username);
+      if (result) dispatch(messagesActions.addMessage(result));
       setNewMessage('');
+      messageInputRef.current?.focus();
     } catch (err) {
       console.error('❌ Send error:', err);
       toast.error('Ошибка отправки сообщения');
     }
   };
 
-  const handleRefresh = () => {
-    window.location.reload();
-  };
-
+  const handleRefresh = () => window.location.reload();
   const handleLogout = () => {
     localStorage.clear();
     dispatch(logout());
@@ -151,10 +149,7 @@ const ChatPage = () => {
           </Navbar.Brand>
           <div className="d-flex align-items-center">
             <span className="me-3 text-muted">{user?.username}</span>
-            <Button 
-              variant="primary" 
-              onClick={handleLogout}
-            >
+            <Button variant="primary" onClick={handleLogout}>
               Выйти
             </Button>
           </div>
@@ -174,35 +169,41 @@ const ChatPage = () => {
 
       <Container className="h-100 my-4 overflow-hidden rounded shadow">
         <div className="row h-100 bg-white flex-md-row">
-          
           <div className="col-4 col-md-2 border-end px-0 bg-light flex-column h-100 d-flex">
             <div className="d-flex mt-1 justify-content-between mb-2 ps-4 pe-2 p-4">
               <b>Каналы</b>
-              <Button 
-                type="button" 
+              <Button
+                type="button"
                 className="p-0 text-primary btn btn-group-vertical border-0 bg-transparent"
                 onClick={() => setShowAddModal(true)}
                 title="Добавить канал"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" fill="currentColor" className="bi bi-plus-square">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 16 16"
+                  width="20"
+                  height="20"
+                  fill="currentColor"
+                  className="bi bi-plus-square"
+                >
                   <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"></path>
                   <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"></path>
                 </svg>
                 <span className="visually-hidden">+</span>
               </Button>
             </div>
-            
+
             <div className="nav flex-column nav-pills nav-fill px-2 mb-3 overflow-auto h-100 d-block">
-              {channels.map(channel => (
+              {channels.map((channel) => (
                 <button
                   key={channel.id}
                   type="button"
-                  role="button"
                   className={`w-100 rounded-0 text-start btn mb-1 ${
-                    channel.id === currentChannel?.id ? 'btn-secondary' : ''
+                    channel.id === currentChannel?.id ? 'btn-secondary' : 'btn-outline-secondary'
                   }`}
                   onClick={() => handleChannelSelect(channel.id)}
                 >
+                  <span className="me-1">#</span>
                   {channel.name}
                 </button>
               ))}
@@ -213,7 +214,7 @@ const ChatPage = () => {
             <div className="d-flex flex-column h-100">
               <div className="bg-light mb-4 p-3 shadow-sm small">
                 <p className="m-0">
-                  <b>{currentChannel?.name || 'general'}</b>
+                  <b>#{currentChannel?.name || 'general'}</b>
                 </p>
                 <span className="text-muted">
                   {currentMessages.length} {getMessageCountText(currentMessages.length)}
@@ -223,12 +224,10 @@ const ChatPage = () => {
               <div className="chat-messages overflow-auto px-5 flex-grow-1">
                 {currentMessages.length > 0 ? (
                   <>
-                    {currentMessages.map(message => (
+                    {currentMessages.map((message) => (
                       <div key={message.id} className="mb-3">
                         <div className="d-flex align-items-start">
-                          <strong className="text-primary me-2">
-                            {message.username}:
-                          </strong>
+                          <strong className="text-primary me-2">{message.username}:</strong>
                           <span className="message-text">{message.body}</span>
                         </div>
                       </div>
@@ -255,15 +254,9 @@ const ChatPage = () => {
                       value={newMessage}
                       onChange={(e) => setNewMessage(e.target.value)}
                     />
-                    <Button 
-                      type="submit" 
-                      disabled={!newMessage.trim()}
-                      className="btn btn-group-vertical border-0"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" fill="currentColor" className="bi bi-arrow-right-square">
-                        <path fillRule="evenodd" d="M15 2a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1zM0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm4.5 5.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5z"></path>
-                      </svg>
+                    <Button type="submit" disabled={!newMessage.trim()} className="btn btn-group-vertical border-0">
                       <span className="visually-hidden">Отправить</span>
+                      ➤
                     </Button>
                   </InputGroup>
                 </Form>
@@ -273,17 +266,12 @@ const ChatPage = () => {
         </div>
       </Container>
 
-      <ModalAddChannel
-        show={showAddModal}
-        onHide={() => setShowAddModal(false)}
-      />
-      
+      <ModalAddChannel show={showAddModal} onHide={() => setShowAddModal(false)} />
       <ModalRenameChannel
         show={showRenameModal}
         onHide={() => setShowRenameModal(false)}
         currentChannel={selectedChannel}
       />
-      
       <ModalRemoveChannel
         show={showRemoveModal}
         onHide={() => setShowRemoveModal(false)}
