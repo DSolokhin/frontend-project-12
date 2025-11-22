@@ -1,8 +1,10 @@
+// src/components/ChatPage.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout, selectCurrentUser } from '../store/slices/authSlice';
 import { 
-  Container, Navbar, Button, Alert, Spinner, Form, InputGroup 
+  Container, Navbar, Button, Card, ListGroup, Form, InputGroup, 
+  Alert, Spinner, Dropdown 
 } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import { useApi } from '../hooks/index.jsx';
@@ -18,28 +20,48 @@ const ChatPage = () => {
   const dispatch = useDispatch();
   const api = useApi();
   const user = useSelector(selectCurrentUser);
-
+  
+  // Селекторы из Redux
   const channels = useSelector(channelsSelectors.allChannels);
   const currentChannel = useSelector(channelsSelectors.currentChannel);
   const currentMessages = useSelector(messagesSelectors.currentChannelMessages);
-
+  
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-
+  
+  // Рефы для автофокуса и скролла
   const messageInputRef = useRef(null);
   const messagesEndRef = useRef(null);
-
+  
+  // Модальные окна
   const [showAddModal, setShowAddModal] = useState(false);
   const [showRenameModal, setShowRenameModal] = useState(false);
   const [showRemoveModal, setShowRemoveModal] = useState(false);
   const [selectedChannel, setSelectedChannel] = useState(null);
 
+  // Автофокус на поле ввода
+  useEffect(() => {
+    if (messageInputRef.current && currentChannel && !loading) {
+      messageInputRef.current.focus();
+    }
+  }, [currentChannel?.id, loading]);
+
+  // Автоскролл к новым сообщениям
+  useEffect(() => {
+    if (!loading) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [currentMessages, loading]);
+
+  // Загрузка начальных данных
   useEffect(() => {
     const loadInitialData = async () => {
       try {
         const token = localStorage.getItem('token');
-
+        console.log('🔄 Starting data loading...');
+        
+        // Параллельная загрузка
         const [channelsResponse, messagesResponse] = await Promise.all([
           fetch('/api/v1/channels', {
             headers: { 
@@ -54,24 +76,32 @@ const ChatPage = () => {
             }
           })
         ]);
-
+        
         if (!channelsResponse.ok) throw new Error('Channels load failed');
         if (!messagesResponse.ok) throw new Error('Messages load failed');
-
+        
         const channelsData = await channelsResponse.json();
         const messagesData = await messagesResponse.json();
-
-        // Добавляем general, если нет
-        if (!channelsData.find(c => c.name === 'general')) {
-          channelsData.unshift({ id: 1, name: 'general' });
-        }
-
+        
+        console.log('✅ Data loaded:', { 
+          channels: channelsData.length, 
+          messages: messagesData.length 
+        });
+        
+        // Диспатчим данные
         dispatch(channelsActions.addChannels(channelsData));
         dispatch(messagesActions.addMessages(messagesData));
-
-        // Устанавливаем текущий канал сразу
-        dispatch(channelsActions.changeChannel(channelsData[0].id));
-
+        
+        // АВТОМАТИЧЕСКАЯ УСТАНОВКА КАНАЛА general
+        if (channelsData.length > 0) {
+          // Ищем канал general по имени или берем первый
+          const generalChannel = channelsData.find(ch => ch.name === 'general') || channelsData[0];
+          if (generalChannel) {
+            dispatch(channelsActions.changeChannel(generalChannel.id));
+            console.log('🎯 Auto-selected channel:', generalChannel.name, 'ID:', generalChannel.id);
+          }
+        }
+        
       } catch (err) {
         console.error('❌ Load error:', err);
         setError('Ошибка загрузки данных');
@@ -84,25 +114,33 @@ const ChatPage = () => {
     loadInitialData();
   }, [dispatch]);
 
+  // Дополнительная проверка - если каналы загружены, но currentChannel не установлен
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [currentMessages]);
+    if (!loading && channels.length > 0 && !currentChannel) {
+      const generalChannel = channels.find(ch => ch.name === 'general') || channels[0];
+      if (generalChannel) {
+        dispatch(channelsActions.changeChannel(generalChannel.id));
+        console.log('🔄 Forced channel selection:', generalChannel.name);
+      }
+    }
+  }, [channels, currentChannel, loading, dispatch]);
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!newMessage.trim() || !currentChannel) return;
-
+    
     try {
       const result = await api.addMessage(
         newMessage.trim(),
         currentChannel.id,
         user?.username
       );
-
+      
+      // Диспатчим новое сообщение в Redux
       if (result) {
         dispatch(messagesActions.addMessage(result));
       }
-
+      
       setNewMessage('');
     } catch (err) {
       console.error('❌ Send error:', err);
@@ -133,6 +171,15 @@ const ChatPage = () => {
     dispatch(channelsActions.changeChannel(channelId));
   };
 
+  // Отладка состояния
+  console.log('📊 ChatPage state:', {
+    loading,
+    channelsCount: channels.length,
+    currentChannel: currentChannel?.name,
+    currentChannelId: useSelector(state => state.channels.currentChannelId),
+    messagesCount: currentMessages.length
+  });
+
   if (loading) {
     return (
       <div className="d-flex flex-column vh-100">
@@ -153,8 +200,12 @@ const ChatPage = () => {
     );
   }
 
+  // Определяем отображаемый канал (currentChannel или fallback)
+  const displayChannel = currentChannel || channels.find(ch => ch.name === 'general') || { name: 'general' };
+
   return (
     <div className="d-flex flex-column vh-100 bg-light">
+      {/* Навбар */}
       <Navbar bg="white" expand="lg" className="shadow-sm navbar-light">
         <Container>
           <Navbar.Brand href="/" className="fw-bold text-primary">
@@ -162,7 +213,12 @@ const ChatPage = () => {
           </Navbar.Brand>
           <div className="d-flex align-items-center">
             <span className="me-3 text-muted">{user?.username}</span>
-            <Button variant="primary" onClick={handleLogout}>Выйти</Button>
+            <Button 
+              variant="primary" 
+              onClick={handleLogout}
+            >
+              Выйти
+            </Button>
           </div>
         </Container>
       </Navbar>
@@ -180,40 +236,82 @@ const ChatPage = () => {
 
       <Container className="h-100 my-4 overflow-hidden rounded shadow">
         <div className="row h-100 bg-white flex-md-row">
+          
+          {/* Боковая панель с каналами */}
           <div className="col-4 col-md-2 border-end px-0 bg-light flex-column h-100 d-flex">
             <div className="d-flex mt-1 justify-content-between mb-2 ps-4 pe-2 p-4">
               <b>Каналы</b>
-              <Button
-                type="button"
+              <Button 
+                type="button" 
                 className="p-0 text-primary btn btn-group-vertical border-0 bg-transparent"
                 onClick={() => setShowAddModal(true)}
                 title="Добавить канал"
               >
-                +
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" fill="currentColor" className="bi bi-plus-square">
+                  <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"></path>
+                  <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"></path>
+                </svg>
+                <span className="visually-hidden">+</span>
               </Button>
             </div>
-
+            
+            {/* Список каналов с dropdown меню */}
             <div className="nav flex-column nav-pills nav-fill px-2 mb-3 overflow-auto h-100 d-block">
               {channels.map(channel => (
-                <button
-                  key={channel.id}
-                  type="button"
-                  role="button"
-                  className={`w-100 rounded-0 text-start btn mb-1 ${
-                    channel.id === currentChannel?.id ? 'btn-secondary' : 'btn-light'
-                  }`}
-                  onClick={() => handleChannelSelect(channel.id)}
-                >
-                  #{channel.name}
-                </button>
+                <div key={channel.id} className="d-flex align-items-center mb-1">
+                  <button
+                    type="button"
+                    role="button"
+                    className={`flex-grow-1 rounded-0 text-start btn ${
+                      channel.id === currentChannel?.id ? 'btn-secondary' : ''
+                    }`}
+                    onClick={() => handleChannelSelect(channel.id)}
+                  >
+                    # {channel.name}
+                  </button>
+                  
+                  {/* Dropdown меню для управления каналами */}
+                  {channel.removable && (
+                    <Dropdown className="ms-1">
+                      <Dropdown.Toggle 
+                        variant={channel.id === currentChannel?.id ? "secondary" : "light"}
+                        size="sm"
+                        className="flex-grow-0 dropdown-toggle-split"
+                        id={`dropdown-channel-${channel.id}`}
+                      >
+                        <span className="visually-hidden">Управление каналом</span>
+                      </Dropdown.Toggle>
+
+                      <Dropdown.Menu>
+                        <Dropdown.Item 
+                          onClick={() => openRenameModal(channel)}
+                          className="d-flex align-items-center"
+                        >
+                          <span className="me-2"></span>
+                          Переименовать
+                        </Dropdown.Item>
+                        <Dropdown.Item 
+                          onClick={() => openRemoveModal(channel)}
+                          className="text-danger d-flex align-items-center"
+                        >
+                          <span className="me-2"></span>
+                          Удалить
+                        </Dropdown.Item>
+                      </Dropdown.Menu>
+                    </Dropdown>
+                  )}
+                </div>
               ))}
             </div>
           </div>
 
+          {/* Область чата */}
           <div className="col p-0 h-100">
             <div className="d-flex flex-column h-100">
               <div className="bg-light mb-4 p-3 shadow-sm small">
-                <p className="m-0"><b>#{currentChannel?.name || 'general'}</b></p>
+                <p className="m-0">
+                  <b># {displayChannel.name}</b>
+                </p>
                 <span className="text-muted">
                   {currentMessages.length} {getMessageCountText(currentMessages.length)}
                 </span>
@@ -225,7 +323,9 @@ const ChatPage = () => {
                     {currentMessages.map(message => (
                       <div key={message.id} className="mb-3">
                         <div className="d-flex align-items-start">
-                          <strong className="text-primary me-2">{message.username}:</strong>
+                          <strong className="text-primary me-2">
+                            {message.username}:
+                          </strong>
                           <span className="message-text">{message.body}</span>
                         </div>
                       </div>
@@ -251,13 +351,17 @@ const ChatPage = () => {
                       className="border-0 p-0 ps-2 form-control"
                       value={newMessage}
                       onChange={(e) => setNewMessage(e.target.value)}
+                      disabled={!currentChannel}
                     />
                     <Button 
                       type="submit" 
-                      disabled={!newMessage.trim()}
+                      disabled={!newMessage.trim() || !currentChannel}
                       className="btn btn-group-vertical border-0"
                     >
-                      Отправить
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" fill="currentColor" className="bi bi-arrow-right-square">
+                        <path fillRule="evenodd" d="M15 2a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1zM0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm4.5 5.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5z"></path>
+                      </svg>
+                      <span className="visually-hidden">Отправить</span>
                     </Button>
                   </InputGroup>
                 </Form>
@@ -271,11 +375,13 @@ const ChatPage = () => {
         show={showAddModal}
         onHide={() => setShowAddModal(false)}
       />
+      
       <ModalRenameChannel
         show={showRenameModal}
         onHide={() => setShowRenameModal(false)}
         currentChannel={selectedChannel}
       />
+      
       <ModalRemoveChannel
         show={showRemoveModal}
         onHide={() => setShowRemoveModal(false)}
@@ -286,9 +392,13 @@ const ChatPage = () => {
 };
 
 const getMessageCountText = (count) => {
-  if (count % 10 === 1 && count % 100 !== 11) return 'сообщение';
-  if ([2, 3, 4].includes(count % 10) && ![12, 13, 14].includes(count % 100)) return 'сообщения';
-  return 'сообщений';
+  if (count % 10 === 1 && count % 100 !== 11) {
+    return 'сообщение';
+  } else if ([2, 3, 4].includes(count % 10) && ![12, 13, 14].includes(count % 100)) {
+    return 'сообщения';
+  } else {
+    return 'сообщений';
+  }
 };
 
 export default ChatPage;
