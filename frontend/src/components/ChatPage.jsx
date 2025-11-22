@@ -1,4 +1,3 @@
-// src/components/ChatPage.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout, selectCurrentUser } from '../store/slices/authSlice';
@@ -21,7 +20,6 @@ const ChatPage = () => {
   const api = useApi();
   const user = useSelector(selectCurrentUser);
   
-  // Селекторы из Redux
   const channels = useSelector(channelsSelectors.allChannels);
   const currentChannel = useSelector(channelsSelectors.currentChannel);
   const currentMessages = useSelector(messagesSelectors.currentChannelMessages);
@@ -30,23 +28,19 @@ const ChatPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   
-  // Рефы для автофокуса и скролла
   const messageInputRef = useRef(null);
   const messagesEndRef = useRef(null);
   
-  // Модальные окна
   const [showAddModal, setShowAddModal] = useState(false);
   const [showRenameModal, setShowRenameModal] = useState(false);
   const [showRemoveModal, setShowRemoveModal] = useState(false);
   const [selectedChannel, setSelectedChannel] = useState(null);
 
-  // Загрузка начальных данных
   useEffect(() => {
     const loadInitialData = async () => {
       try {
         const token = localStorage.getItem('token');
         
-        // Параллельная загрузка
         const [channelsResponse, messagesResponse] = await Promise.all([
           fetch('/api/v1/channels', {
             headers: { 
@@ -68,7 +62,6 @@ const ChatPage = () => {
         const channelsData = await channelsResponse.json();
         const messagesData = await messagesResponse.json();
         
-        // Диспатчим данные
         dispatch(channelsActions.addChannels(channelsData));
         dispatch(messagesActions.addMessages(messagesData));
         
@@ -151,7 +144,6 @@ const ChatPage = () => {
 
   return (
     <div className="d-flex flex-column vh-100 bg-light">
-      {/* Навбар */}
       <Navbar bg="white" expand="lg" className="shadow-sm navbar-light">
         <Container>
           <Navbar.Brand href="/" className="fw-bold text-primary">
@@ -183,7 +175,6 @@ const ChatPage = () => {
       <Container className="h-100 my-4 overflow-hidden rounded shadow">
         <div className="row h-100 bg-white flex-md-row">
           
-          {/* Боковая панель с каналами - УПРОЩЕННАЯ ВЕРСИЯ */}
           <div className="col-4 col-md-2 border-end px-0 bg-light flex-column h-100 d-flex">
             <div className="d-flex mt-1 justify-content-between mb-2 ps-4 pe-2 p-4">
               <b>Каналы</b>
@@ -201,7 +192,6 @@ const ChatPage = () => {
               </Button>
             </div>
             
-            {/* ПРОСТЫЕ КНОПКИ КАНАЛОВ БЕЗ СЛОЖНОЙ СТРУКТУРЫ */}
             <div className="nav flex-column nav-pills nav-fill px-2 mb-3 overflow-auto h-100 d-block">
               {channels.map(channel => (
                 <button
@@ -213,18 +203,17 @@ const ChatPage = () => {
                   }`}
                   onClick={() => handleChannelSelect(channel.id)}
                 >
-                  # {channel.name}
+                  {channel.name}
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Область чата */}
           <div className="col p-0 h-100">
             <div className="d-flex flex-column h-100">
               <div className="bg-light mb-4 p-3 shadow-sm small">
                 <p className="m-0">
-                  <b># {currentChannel?.name || 'general'}</b>
+                  <b>{currentChannel?.name || 'general'}</b>
                 </p>
                 <span className="text-muted">
                   {currentMessages.length} {getMessageCountText(currentMessages.length)}
