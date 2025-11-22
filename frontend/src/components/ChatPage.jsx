@@ -219,14 +219,13 @@ const ChatPage = () => {
                     <button
                       type="button"
                       role="button"
-                      aria-label={channel.name}
                       className={`w-100 rounded-0 text-start btn ${
                         channel.id === currentChannel?.id ? 'btn-secondary' : ''
                       }`}
                       onClick={() => handleChannelSelect(channel.id)}
                     >
                       <span className="me-1">#</span>
-                      {channel.name}
+                      <span>{channel.name}</span>
                     </button>
                     
                     {/* Кнопки редактирования и удаления для removable каналов */}
