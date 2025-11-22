@@ -1,17 +1,15 @@
-// components/RegistrationPage.jsx
 import React, { useState } from 'react'
 import { Formik, Form, Field } from 'formik'
 import { useNavigate, Link } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { setCredentials } from '../store/slices/authSlice'
-import { Form as BootstrapForm, Button, Alert, Card, Container, Row, Col } from 'react-bootstrap'
+import { Form as BootstrapForm, Button, Alert, Card, Container, Row, Col, Navbar } from 'react-bootstrap'
 import axios from 'axios'
 
 const RegistrationPage = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const [regError, setRegError] = useState('')
-  const [regSuccess, setRegSuccess] = useState('')
 
   const getApiBaseUrl = () => {
     if (import.meta.env.PROD) {
@@ -23,31 +21,21 @@ const RegistrationPage = () => {
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
       setRegError('')
-      setRegSuccess('')
       
       const apiUrl = `${getApiBaseUrl()}/api/v1/signup`
-      console.log('🔐 [RegistrationPage] Signup URL:', apiUrl)
       
       const response = await axios.post(apiUrl, {
         username: values.username,
         password: values.password
       })
 
-      console.log('🔐 [RegistrationPage] Ответ сервера:', response.data)
-
       if (response.data && response.data.token) {
-        console.log('🔐 [RegistrationPage] Регистрация успешна, токен получен')
-        
-        // Автоматически логиним пользователя после регистрации
         dispatch(setCredentials({
           user: { username: response.data.username },
           token: response.data.token
         }))
 
-        setRegSuccess('Регистрация успешна! Вы автоматически вошли в систему.')
-        
         setTimeout(() => {
-          console.log('🔐 [RegistrationPage] Переход на главную страницу...')
           navigate('/')
         }, 2000)
         
@@ -103,109 +91,127 @@ const RegistrationPage = () => {
   }
 
   return (
-    <Container fluid className="d-flex align-items-center justify-content-center min-vh-100 bg-light">
-      <Row className="w-100 justify-content-center">
-        <Col xs={12} sm={8} md={6} lg={4}>
-          <Card className="shadow">
-            <Card.Body className="p-4">
-              <div className="text-center mb-4">
-                <h1 className="h3">DS Chat</h1>
-                <p className="text-muted">Регистрация</p>
-              </div>
+    <div className="vh-100 bg-light">
+      {/* Навбар с заголовком */}
+      <Navbar bg="white" className="shadow-sm">
+        <Container>
+          <Navbar.Brand href="/" className="fw-bold text-primary">
+            Hexlet Chat
+          </Navbar.Brand>
+        </Container>
+      </Navbar>
+
+      {/* Основной контент */}
+      <Container className="h-100 d-flex align-items-center justify-content-center">
+        <Card className="shadow-sm border-0" style={{ maxWidth: '1000px', width: '100%' }}>
+          <Card.Body className="p-4">
+            <Row className="align-items-center">
+              {/* Большая картинка слева */}
+              <Col xs={12} md={6} className="d-flex align-items-center justify-content-center mb-4 mb-md-0">
+                <img 
+                  src="logo512.jpg" 
+                  alt="Регистрация" 
+                  width="200" 
+                  height="200"
+                  className="rounded-circle"
+                />
+              </Col>
               
-              {regError && (
-                <Alert variant="danger" className="mb-3">
-                  {regError}
-                </Alert>
-              )}
-
-              {regSuccess && (
-                <Alert variant="success" className="mb-3">
-                  {regSuccess}
-                </Alert>
-              )}
-
-              <Formik
-                initialValues={{ 
-                  username: '', 
-                  password: '', 
-                  confirmPassword: '' 
-                }}
-                validate={validate}
-                onSubmit={handleSubmit}
-              >
-                {({ isSubmitting, errors, touched }) => (
-                  <Form>
-                    <BootstrapForm.Group className="mb-3">
-                      <BootstrapForm.Label>Имя пользователя</BootstrapForm.Label>
-                      <Field 
-                        as={BootstrapForm.Control}
-                        type="text" 
-                        name="username" 
-                        placeholder="Введите имя пользователя"
-                        isInvalid={touched.username && errors.username}
-                      />
-                      {errors.username && touched.username && (
-                        <BootstrapForm.Control.Feedback type="invalid">
-                          {errors.username}
-                        </BootstrapForm.Control.Feedback>
-                      )}
-                    </BootstrapForm.Group>
-
-                    <BootstrapForm.Group className="mb-3">
-                      <BootstrapForm.Label>Пароль</BootstrapForm.Label>
-                      <Field 
-                        as={BootstrapForm.Control}
-                        type="password" 
-                        name="password" 
-                        placeholder="Введите пароль"
-                        isInvalid={touched.password && errors.password}
-                      />
-                      {errors.password && touched.password && (
-                        <BootstrapForm.Control.Feedback type="invalid">
-                          {errors.password}
-                        </BootstrapForm.Control.Feedback>
-                      )}
-                    </BootstrapForm.Group>
-
-                    <BootstrapForm.Group className="mb-4">
-                      <BootstrapForm.Label>Подтвердите пароль</BootstrapForm.Label>
-                      <Field 
-                        as={BootstrapForm.Control}
-                        type="password" 
-                        name="confirmPassword" 
-                        placeholder="Повторите пароль"
-                        isInvalid={touched.confirmPassword && errors.confirmPassword}
-                      />
-                      {errors.confirmPassword && touched.confirmPassword && (
-                        <BootstrapForm.Control.Feedback type="invalid">
-                          {errors.confirmPassword}
-                        </BootstrapForm.Control.Feedback>
-                      )}
-                    </BootstrapForm.Group>
-
-                    <Button 
-                      variant="primary" 
-                      type="submit" 
-                      disabled={isSubmitting}
-                      className="w-100 mb-3"
-                    >
-                      {isSubmitting ? 'Регистрация...' : 'Зарегистрироваться'}
-                    </Button>
-
-                    <div className="text-center">
-                      <small className="text-muted">
-                        Уже есть аккаунт? <Link to="/login">Войдите</Link>
-                      </small>
-                    </div>
-                  </Form>
+              {/* Компактная форма справа */}
+              <Col xs={12} md={6}>
+                <div className="mb-4">
+                  <h1 className="h3 text-primary mb-2">Регистрация</h1>
+                  <p className="text-muted mb-0">Создайте новый аккаунт</p>
+                </div>
+                
+                {regError && (
+                  <Alert variant="danger" className="mb-3">
+                    {regError}
+                  </Alert>
                 )}
-              </Formik>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-    </Container>
+
+                <Formik
+                  initialValues={{ 
+                    username: '', 
+                    password: '', 
+                    confirmPassword: '' 
+                  }}
+                  validate={validate}
+                  onSubmit={handleSubmit}
+                >
+                  {({ isSubmitting, errors, touched }) => (
+                    <Form>
+                      <BootstrapForm.Group className="mb-3">
+                        <BootstrapForm.Label className="fw-semibold">Имя пользователя</BootstrapForm.Label>
+                        <Field 
+                          as={BootstrapForm.Control}
+                          type="text" 
+                          name="username" 
+                          placeholder="Введите имя пользователя"
+                          isInvalid={touched.username && errors.username}
+                        />
+                        {errors.username && touched.username && (
+                          <BootstrapForm.Control.Feedback type="invalid">
+                            {errors.username}
+                          </BootstrapForm.Control.Feedback>
+                        )}
+                      </BootstrapForm.Group>
+
+                      <BootstrapForm.Group className="mb-3">
+                        <BootstrapForm.Label className="fw-semibold">Пароль</BootstrapForm.Label>
+                        <Field 
+                          as={BootstrapForm.Control}
+                          type="password" 
+                          name="password" 
+                          placeholder="Введите пароль"
+                          isInvalid={touched.password && errors.password}
+                        />
+                        {errors.password && touched.password && (
+                          <BootstrapForm.Control.Feedback type="invalid">
+                            {errors.password}
+                          </BootstrapForm.Control.Feedback>
+                        )}
+                      </BootstrapForm.Group>
+
+                      <BootstrapForm.Group className="mb-4">
+                        <BootstrapForm.Label className="fw-semibold">Подтвердите пароль</BootstrapForm.Label>
+                        <Field 
+                          as={BootstrapForm.Control}
+                          type="password" 
+                          name="confirmPassword" 
+                          placeholder="Повторите пароль"
+                          isInvalid={touched.confirmPassword && errors.confirmPassword}
+                        />
+                        {errors.confirmPassword && touched.confirmPassword && (
+                          <BootstrapForm.Control.Feedback type="invalid">
+                            {errors.confirmPassword}
+                          </BootstrapForm.Control.Feedback>
+                        )}
+                      </BootstrapForm.Group>
+
+                      <Button 
+                        variant="primary" 
+                        type="submit" 
+                        disabled={isSubmitting}
+                        className="w-100 mb-3"
+                      >
+                        {isSubmitting ? 'Регистрация...' : 'Зарегистрироваться'}
+                      </Button>
+
+                      <div className="text-center">
+                        <small className="text-muted">
+                          Уже есть аккаунт? <Link to="/login" className="text-decoration-none">Войдите</Link>
+                        </small>
+                      </div>
+                    </Form>
+                  )}
+                </Formik>
+              </Col>
+            </Row>
+          </Card.Body>
+        </Card>
+      </Container>
+    </div>
   )
 }
 

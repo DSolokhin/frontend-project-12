@@ -21,7 +21,15 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@hexlet/chat-server": "^2.0.4"
+    "@hexlet/chat-server": "^2.0.4",
+    "@reduxjs/toolkit": "^2.10.1",
+    "@vitejs/plugin-react": "^5.1.1",
+    "axios": "^1.13.2",
+    "leo-profanity": "^1.8.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-redux": "^9.2.0",
+    "react-router-dom": "^7.9.6",
+    "react-toastify": "^11.0.5"
   }
 }
-

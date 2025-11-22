@@ -363,3 +363,23 @@ button:disabled {
   color: #666;
   margin: 10px 0;
 }
+
+.message-container {
+  min-height: 0;
+}
+
+.message-content {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  max-width: 100%;
+}
+
+.channel-list {
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+}
+
+.messages-area {
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+}

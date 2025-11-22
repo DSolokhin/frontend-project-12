@@ -1,45 +1,39 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createSlice, createEntityAdapter } from '@reduxjs/toolkit';
+import { actions as channelsActions } from './channelsSlice.js';
+
+const messagesAdapter = createEntityAdapter();
+
+const initialState = messagesAdapter.getInitialState();
 
 const messagesSlice = createSlice({
   name: 'messages',
-  initialState: {
-    messages: [],
-    loading: false,
-    error: null,
-  },
+  initialState,
   reducers: {
-    setMessages: (state, action) => {
-      state.messages = action.payload
-    },
-    addMessage: (state, action) => {
-      state.messages.push(action.payload)
-    },
-    removeMessage: (state, action) => {
-      state.messages = state.messages.filter(msg => msg.id !== action.payload)
-    },
-    setLoading: (state, action) => {
-      state.loading = action.payload
-    },
-    setError: (state, action) => {
-      state.error = action.payload
-    },
+    addMessages: messagesAdapter.addMany,
+    addMessage: messagesAdapter.addOne,
   },
-})
+  extraReducers: (builder) => {
+    builder
+      .addCase(channelsActions.removeChannel, (state, action) => {
+        const channelId = action.payload;
+        const channelMessages = Object.values(state.entities)
+          .filter((message) => message.channelId === channelId)
+          .map((message) => message.id);
+        messagesAdapter.removeMany(state, channelMessages);
+      });
+  },
+});
 
-export const {
-  setMessages,
-  addMessage,
-  removeMessage,
-  setLoading,
-  setError,
-} = messagesSlice.actions
+export const { actions } = messagesSlice;
 
-export default messagesSlice.reducer
+const selectors = messagesAdapter.getSelectors((state) => state.messages);
+export const customSelectors = {
+  allMessages: selectors.selectAll,
+  currentChannelMessages: (state) => {
+    const { currentChannelId } = state.channels;
+    return selectors.selectAll(state)
+      .filter(({ channelId }) => channelId === currentChannelId);
+  },
+};
 
-// Селекторы
-export const selectMessages = (state) => state.messages.messages
-export const selectMessagesByChannel = (channelId) => (state) =>
-  state.messages.messages.filter(msg => msg.channelId === channelId)
-export const selectMessagesLoading = (state) => state.messages.loading
-export const selectMessagesError = (state) => state.messages.error
-
+export default messagesSlice.reducer;

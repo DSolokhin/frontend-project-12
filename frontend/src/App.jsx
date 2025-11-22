@@ -2,11 +2,13 @@
 import React, { useEffect } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
+import { ToastContainer } from 'react-toastify'
 import { selectIsAuthenticated, initializeAuth } from './store/slices/authSlice'
 import ChatPage from './components/ChatPage'
 import LoginPage from './components/LoginPage'
-import RegistrationPage from './components/RegistrationPage' // Добавляем импорт
+import RegistrationPage from './components/RegistrationPage'
 import NotFoundPage from './components/NotFoundPage'
+import 'react-toastify/dist/ReactToastify.css'
 import './App.css'
 
 const PrivateRoute = ({ children }) => {
@@ -14,7 +16,6 @@ const PrivateRoute = ({ children }) => {
   return isAuthenticated ? children : <Navigate to="/login" />
 }
 
-// Компонент для редиректа авторизованных пользователей
 const PublicRoute = ({ children }) => {
   const isAuthenticated = useSelector(selectIsAuthenticated)
   return !isAuthenticated ? children : <Navigate to="/" />
@@ -23,7 +24,6 @@ const PublicRoute = ({ children }) => {
 function App() {
   const dispatch = useDispatch()
 
-  // Инициализируем авторизацию при загрузке приложения
   useEffect(() => {
     console.log('🔐 [App] Initializing auth from localStorage...')
     dispatch(initializeAuth())
@@ -49,7 +49,7 @@ function App() {
           } 
         />
         <Route 
-          path="/register" 
+          path="/signup" 
           element={
             <PublicRoute>
               <RegistrationPage />
@@ -58,6 +58,20 @@ function App() {
         />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
+      
+      {/* Toast уведомления */}
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
     </div>
   )
 }
