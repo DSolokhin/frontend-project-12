@@ -162,7 +162,7 @@ const ChatPage = () => {
       {/* Навбар - исправленный на белый */}
       <Navbar bg="white" expand="lg" className="shadow-sm navbar-light">
         <Container>
-          <Navbar.Brand href="/" className="fw-bold">
+          <Navbar.Brand href="/" className="fw-bold text-primary">
             Hexlet Chat
           </Navbar.Brand>
           <div className="d-flex align-items-center">
@@ -202,6 +202,7 @@ const ChatPage = () => {
                 className="p-0 text-primary btn btn-group-vertical border-0 bg-transparent"
                 onClick={() => setShowAddModal(true)}
                 title="Добавить канал"
+                aria-label="Добавить канал"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" fill="currentColor" className="bi bi-plus-square">
                   <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"></path>
@@ -217,6 +218,8 @@ const ChatPage = () => {
                   <div className="d-flex align-items-center w-100">
                     <button
                       type="button"
+                      role="button"
+                      aria-label={channel.name}
                       className={`w-100 rounded-0 text-start btn ${
                         channel.id === currentChannel?.id ? 'btn-secondary' : ''
                       }`}
@@ -234,6 +237,7 @@ const ChatPage = () => {
                           type="button"
                           data-bs-toggle="dropdown"
                           aria-expanded="false"
+                          aria-label={`Управление каналом ${channel.name}`}
                         >
                           <span className="text-muted fs-6">⋯</span>
                         </button>
@@ -319,6 +323,7 @@ const ChatPage = () => {
                       type="submit" 
                       disabled={!newMessage.trim()}
                       className="btn btn-group-vertical border-0"
+                      aria-label="Отправить сообщение"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" fill="currentColor" className="bi bi-arrow-right-square">
                         <path fillRule="evenodd" d="M15 2a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1zM0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm4.5 5.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5z"></path>
