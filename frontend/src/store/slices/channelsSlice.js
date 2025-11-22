@@ -30,7 +30,6 @@ export const { actions } = channelsSlice;
 const selectors = channelsAdapter.getSelectors((state) => state.channels);
 export const customSelectors = {
   allChannels: selectors.selectAll,
-  channelsNames: (state) => selectors.selectAll(state).map(({ name }) => name),
   currentChannel: (state) => {
     const { currentChannelId } = state.channels;
     return selectors.selectById(state, currentChannelId);
