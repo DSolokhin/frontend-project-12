@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout, selectCurrentUser } from '../store/slices/authSlice';
 import { 
-  Container, Navbar, Button, Form, InputGroup, Alert, Spinner 
+  Container, Navbar, Button, Alert, Spinner, Form, InputGroup 
 } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import { useApi } from '../hooks/index.jsx';
@@ -18,18 +18,18 @@ const ChatPage = () => {
   const dispatch = useDispatch();
   const api = useApi();
   const user = useSelector(selectCurrentUser);
-  
+
   const channels = useSelector(channelsSelectors.allChannels);
   const currentChannel = useSelector(channelsSelectors.currentChannel);
   const currentMessages = useSelector(messagesSelectors.currentChannelMessages);
-  
+
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  
+
   const messageInputRef = useRef(null);
   const messagesEndRef = useRef(null);
-  
+
   const [showAddModal, setShowAddModal] = useState(false);
   const [showRenameModal, setShowRenameModal] = useState(false);
   const [showRemoveModal, setShowRemoveModal] = useState(false);
@@ -61,7 +61,7 @@ const ChatPage = () => {
         const channelsData = await channelsResponse.json();
         const messagesData = await messagesResponse.json();
 
-        // Всегда добавляем канал general, если его нет
+        // Добавляем general, если нет
         if (!channelsData.find(c => c.name === 'general')) {
           channelsData.unshift({ id: 1, name: 'general' });
         }
@@ -69,10 +69,8 @@ const ChatPage = () => {
         dispatch(channelsActions.addChannels(channelsData));
         dispatch(messagesActions.addMessages(messagesData));
 
-        // Выбираем первый канал как текущий
-        if (channelsData.length > 0) {
-          dispatch(channelsActions.changeChannel(channelsData[0].id));
-        }
+        // Устанавливаем текущий канал сразу
+        dispatch(channelsActions.changeChannel(channelsData[0].id));
 
       } catch (err) {
         console.error('❌ Load error:', err);
@@ -85,6 +83,10 @@ const ChatPage = () => {
 
     loadInitialData();
   }, [dispatch]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [currentMessages]);
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
@@ -108,13 +110,13 @@ const ChatPage = () => {
     }
   };
 
+  const handleRefresh = () => {
+    window.location.reload();
+  };
+
   const handleLogout = () => {
     localStorage.clear();
     dispatch(logout());
-  };
-
-  const handleChannelSelect = (channelId) => {
-    dispatch(channelsActions.changeChannel(channelId));
   };
 
   const openRenameModal = (channel) => {
@@ -125,6 +127,10 @@ const ChatPage = () => {
   const openRemoveModal = (channel) => {
     setSelectedChannel(channel);
     setShowRemoveModal(true);
+  };
+
+  const handleChannelSelect = (channelId) => {
+    dispatch(channelsActions.changeChannel(channelId));
   };
 
   if (loading) {
@@ -138,7 +144,10 @@ const ChatPage = () => {
           </Container>
         </Navbar>
         <div className="d-flex justify-content-center align-items-center flex-grow-1 bg-light">
-          <Spinner animation="border" variant="primary" />
+          <div className="text-center">
+            <Spinner animation="border" variant="primary" />
+            <p className="mt-2 text-muted">Загрузка чата...</p>
+          </div>
         </div>
       </div>
     );
@@ -153,9 +162,7 @@ const ChatPage = () => {
           </Navbar.Brand>
           <div className="d-flex align-items-center">
             <span className="me-3 text-muted">{user?.username}</span>
-            <Button variant="primary" onClick={handleLogout}>
-              Выйти
-            </Button>
+            <Button variant="primary" onClick={handleLogout}>Выйти</Button>
           </div>
         </Container>
       </Navbar>
@@ -164,7 +171,7 @@ const ChatPage = () => {
         <Alert variant="danger" className="m-2 mb-0 rounded-0">
           <div className="d-flex justify-content-between align-items-center">
             <span>{error}</span>
-            <Button size="sm" variant="outline-danger" onClick={() => window.location.reload()}>
+            <Button size="sm" variant="outline-danger" onClick={handleRefresh}>
               Повторить
             </Button>
           </div>
@@ -176,8 +183,8 @@ const ChatPage = () => {
           <div className="col-4 col-md-2 border-end px-0 bg-light flex-column h-100 d-flex">
             <div className="d-flex mt-1 justify-content-between mb-2 ps-4 pe-2 p-4">
               <b>Каналы</b>
-              <Button 
-                type="button" 
+              <Button
+                type="button"
                 className="p-0 text-primary btn btn-group-vertical border-0 bg-transparent"
                 onClick={() => setShowAddModal(true)}
                 title="Добавить канал"
@@ -191,8 +198,9 @@ const ChatPage = () => {
                 <button
                   key={channel.id}
                   type="button"
+                  role="button"
                   className={`w-100 rounded-0 text-start btn mb-1 ${
-                    channel.id === currentChannel?.id ? 'btn-secondary' : ''
+                    channel.id === currentChannel?.id ? 'btn-secondary' : 'btn-light'
                   }`}
                   onClick={() => handleChannelSelect(channel.id)}
                 >
@@ -205,9 +213,7 @@ const ChatPage = () => {
           <div className="col p-0 h-100">
             <div className="d-flex flex-column h-100">
               <div className="bg-light mb-4 p-3 shadow-sm small">
-                <p className="m-0">
-                  <b>#{currentChannel?.name || 'general'}</b>
-                </p>
+                <p className="m-0"><b>#{currentChannel?.name || 'general'}</b></p>
                 <span className="text-muted">
                   {currentMessages.length} {getMessageCountText(currentMessages.length)}
                 </span>
@@ -219,10 +225,8 @@ const ChatPage = () => {
                     {currentMessages.map(message => (
                       <div key={message.id} className="mb-3">
                         <div className="d-flex align-items-start">
-                          <strong className="text-primary me-2">
-                            {message.username}:
-                          </strong>
-                          <span>{message.body}</span>
+                          <strong className="text-primary me-2">{message.username}:</strong>
+                          <span className="message-text">{message.body}</span>
                         </div>
                       </div>
                     ))}
@@ -242,6 +246,7 @@ const ChatPage = () => {
                     <Form.Control
                       ref={messageInputRef}
                       name="body"
+                      aria-label="Новое сообщение"
                       placeholder="Введите сообщение..."
                       className="border-0 p-0 ps-2 form-control"
                       value={newMessage}
@@ -252,7 +257,7 @@ const ChatPage = () => {
                       disabled={!newMessage.trim()}
                       className="btn btn-group-vertical border-0"
                     >
-                      ➤
+                      Отправить
                     </Button>
                   </InputGroup>
                 </Form>
@@ -282,7 +287,7 @@ const ChatPage = () => {
 
 const getMessageCountText = (count) => {
   if (count % 10 === 1 && count % 100 !== 11) return 'сообщение';
-  if ([2,3,4].includes(count % 10) && ![12,13,14].includes(count % 100)) return 'сообщения';
+  if ([2, 3, 4].includes(count % 10) && ![12, 13, 14].includes(count % 100)) return 'сообщения';
   return 'сообщений';
 };
 
