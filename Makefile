@@ -7,4 +7,6 @@ build:
 	cp -r frontend/dist dist
 
 start:
-	npx start-server -s dist -p $${PORT:-5000}
+	( npx start-server -s dist -p $${PORT:-5000} & )
+	sleep 1
+	open http://localhost:5000
