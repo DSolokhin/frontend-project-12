@@ -1,5 +1,7 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+/* eslint-disable import/no-extraneous-dependencies */
+
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
@@ -7,10 +9,10 @@ export default defineConfig({
     port: 3000,
     strictPort: true,
     proxy: {
-      '/api/v1': 'http://localhost:5001'
-    }
+      '/api/v1': 'http://localhost:5001',
+    },
   },
   build: {
-    outDir: 'dist'
-  }
-})
+    outDir: 'dist',
+  },
+});
