@@ -7,5 +7,5 @@ export default [
       'frontend/dist',
     ],
   },
-];
+]
 

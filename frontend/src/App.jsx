@@ -1,5 +1,6 @@
+// frontend/src/App.jsx
 import {
-  BrowserRouter, Routes, Route, Navigate
+  BrowserRouter, Routes, Route, Navigate,
 } from 'react-router-dom'
 import routes from './routes'
 import SignUpPage from './pages/SignUp'
