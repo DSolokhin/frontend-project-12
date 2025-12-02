@@ -1,7 +1,7 @@
-import { createSlice, createEntityAdapter } from '@reduxjs/toolkit';
+import { createSlice, createEntityAdapter } from '@reduxjs/toolkit'
 
-const channelsAdapter = createEntityAdapter();
-const initialState = { show: false, type: 'closed', id: null };
+const channelsAdapter = createEntityAdapter()
+const initialState = { show: false, type: 'closed', id: null }
 
 const modalSlice = createSlice({
   name: 'modal',
@@ -13,9 +13,10 @@ const modalSlice = createSlice({
     }),
     closeModal: () => initialState,
   },
-});
+})
 
-const { actions } = modalSlice;
-const selectors = channelsAdapter.getSelectors((state) => state.modal);
-export { actions, selectors };
-export default modalSlice.reducer;
+const { actions, reducer } = modalSlice
+const selectors = channelsAdapter.getSelectors(state => state.modal)
+
+export { actions, selectors }
+export default reducer
