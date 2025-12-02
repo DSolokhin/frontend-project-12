@@ -1,0 +1,11 @@
+export default [
+  {
+    ignores: [
+      'dist',
+      'node_modules',
+      'frontend/node_modules',
+      'frontend/dist',
+    ],
+  },
+];
+
