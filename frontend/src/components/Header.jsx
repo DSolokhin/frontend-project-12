@@ -15,11 +15,13 @@ const HeaderComponent = () => {
           {t('header.title')}
         </a>
 
-        {loggedIn ? (
-          <Button onClick={auth.logOut}>
-            {t('header.exit')}
-          </Button>
-        ) : null}
+        {loggedIn
+          ? (
+            <Button onClick={auth.logOut}>
+              {t('header.exit')}
+            </Button>
+          )
+          : null}
       </div>
     </nav>
   )
