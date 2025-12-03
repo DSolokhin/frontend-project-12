@@ -29,7 +29,8 @@ const ChatPage = () => {
         dispatch(channelsActions.addChannels(channels))
         dispatch(messagesActions.addMessages(messages))
         dispatch(channelsActions.setChannelId(currentChannelId))
-      } catch (_e) {
+      }
+      catch {
         auth.logOut()
         toast.error(t('toast.networkError'), {
           toastId: 'network-error',
