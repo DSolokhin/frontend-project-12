@@ -65,4 +65,4 @@ export default {
       channelRename: 'Канал переименован',
     },
   },
-};
+}
