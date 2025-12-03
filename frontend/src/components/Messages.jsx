@@ -22,6 +22,7 @@ const MessagesComponent = () => {
       channelId: currentChannel.id,
       username: auth.user.username,
     }
+
     await sendNewMessage(message)
     setText('')
   }
@@ -35,7 +36,7 @@ const MessagesComponent = () => {
       <Form
         className="py-1 border rounded-2"
         noValidate
-        onSubmit={e => {
+        onSubmit={(e) => {
           e.preventDefault()
           sendMessage()
         }}
@@ -45,7 +46,7 @@ const MessagesComponent = () => {
             name="body"
             placeholder="Введите сообщение..."
             value={text}
-            onChange={e => setText(e.target.value)}
+            onChange={(e) => setText(e.target.value)}
             aria-label="Новое сообщение"
             className="border-0 p-0 ps-2"
             noValidate

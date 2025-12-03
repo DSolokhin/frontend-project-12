@@ -19,7 +19,9 @@ const HeaderComponent = () => {
           <Button onClick={auth.logOut}>
             {t('header.exit')}
           </Button>
-        ) : null}
+        ) : (
+          null
+        )}
       </div>
     </nav>
   )

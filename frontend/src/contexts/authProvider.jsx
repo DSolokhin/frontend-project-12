@@ -8,7 +8,7 @@ const AuthProvider = ({ children }) => {
   const savedUser = localStorage.getItem('user')
   const [user, setUser] = useState(savedUser ? JSON.parse(savedUser) : null)
 
-  const logIn = data => {
+  const logIn = (data) => {
     setUser(data)
     localStorage.setItem('user', JSON.stringify(data))
   }
