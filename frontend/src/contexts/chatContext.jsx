@@ -11,19 +11,19 @@ const ChatProvider = ({ socket, children }) => {
   const dispatch = useDispatch()
 
   useEffect(() => {
-    socket.on('newMessage', (msg) => {
+    socket.on('newMessage', msg => {
       dispatch(messagesActions.addMessage(msg))
     })
 
-    socket.on('newChannel', (channel) => {
+    socket.on('newChannel', channel => {
       dispatch(channelsActions.addChannel(channel))
     })
 
-    socket.on('removeChannel', (payload) => {
+    socket.on('removeChannel', payload => {
       dispatch(channelsActions.removeChannel(payload.id))
     })
 
-    socket.on('renameChannel', (payload) => {
+    socket.on('renameChannel', payload => {
       dispatch(
         channelsActions.renameChannel({
           id: payload.id,
@@ -34,7 +34,7 @@ const ChatProvider = ({ socket, children }) => {
   }, [dispatch, socket])
 
   const socValue = useCallback(
-    (action, value) => (
+    (action, value) =>
       new Promise((resolve, reject) => {
         socket
           .timeout(1000)
@@ -45,32 +45,30 @@ const ChatProvider = ({ socket, children }) => {
               reject(err)
             }
           })
-      })
-    ),
+      }),
     [socket],
   )
 
   const sendNewMessage = useCallback(
-    (message) => socValue('newMessage', message),
+    message => socValue('newMessage', message),
     [socValue],
   )
 
   const createChannel = useCallback(
-    (name) => (
+    name =>
       socValue('newChannel', { name })
-        .then((res) => {
+        .then(res => {
           dispatch(channelsActions.addChannel(res.data))
           return res.data
         })
-        .then((added) => {
+        .then(added => {
           dispatch(channelsActions.setChannelId(added.id))
-        })
-    ),
+        }),
     [dispatch, socValue],
   )
 
   const removeChannel = useCallback(
-    (id) => socValue('removeChannel', { id }),
+    id => socValue('removeChannel', { id }),
     [socValue],
   )
 
