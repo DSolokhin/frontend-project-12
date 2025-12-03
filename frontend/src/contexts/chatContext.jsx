@@ -28,10 +28,13 @@ const ChatProvider = ({ socket, children }) => {
         channelsActions.renameChannel({
           id: payload.id,
           changes: payload,
-        })
+        }),
       )
     })
-  }, [dispatch, socket])
+  }, [
+    dispatch,
+    socket,
+  ])
 
   const socValue = useCallback(
     (action, value) => {
@@ -41,7 +44,8 @@ const ChatProvider = ({ socket, children }) => {
           .emit(action, value, (err, response) => {
             if (response?.status === 'ok') {
               resolve(response)
-            } else {
+            }
+            else {
               reject(err)
             }
           })
