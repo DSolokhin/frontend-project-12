@@ -45,7 +45,8 @@ const AddModal = ({ handleClose, toast }) => {
         await createChannel(cleanedName)
         handleClose()
         toast(t('toast.channelAdd'), 'success')
-      } catch {
+      } 
+      catch {
         toast(t('toast.error'), 'error')
       }
     },

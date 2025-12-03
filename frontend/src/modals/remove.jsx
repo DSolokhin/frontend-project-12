@@ -21,7 +21,8 @@ const RemoveModal = ({ handleClose, toast }) => {
       await removeChannel(modalId)
       handleClose(true)
       toast(t('toast.channelRemove'), 'success')
-    } catch {
+    }
+    catch {
       toast(t('toast.error'), 'error')
     }
   }
