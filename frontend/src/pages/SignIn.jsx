@@ -20,23 +20,18 @@ const SignInPage = () => {
       username: '',
       password: '',
     },
-    onSubmit: async values => {
+    onSubmit: async (values) => {
       setAuthFailed(false)
 
       try {
         const res = await axios.post(routes.loginPath(), values)
         auth.logIn(res.data)
         navigate(routes.chat())
-      } catch (err) {
+      }
+      catch {
         formik.setSubmitting(false)
-
-        if (err.isAxiosError && err.response?.status === 401) {
-          setAuthFailed(true)
-          inputRef.current?.select()
-          return
-        }
-
-        throw err
+        setAuthFailed(true)
+        inputRef.current?.select()
       }
     },
   })
