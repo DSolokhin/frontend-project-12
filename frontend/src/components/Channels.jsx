@@ -51,16 +51,16 @@ const ChannelItem = ({
                 {t('chatPage.channels.rename')}
               </Dropdown.Item>
             </Dropdown.Menu>
-
           </Dropdown>
         )
         : (
           <button
             type="button"
             onClick={() => handleChannel(channel.id)}
-            className={cn('w-100 rounded-0 text-start btn', {
-              'btn-secondary': channel.id === currentChannel.id,
-            })}
+            className={cn(
+              'w-100 rounded-0 text-start btn',
+              { 'btn-secondary': channel.id === currentChannel.id },
+            )}
           >
             <span>#</span>
             {' '}
@@ -107,7 +107,6 @@ const ChannelsComponent = () => {
       <div className="col-4 col-md-2 border-end px-0 bg-light flex-column h-100 d-flex">
         <div className="d-flex mt-1 justify-content-between mb-2 ps-4 pe-2 p-4">
           <b>{t('chatPage.channels.title')}</b>
-
           <button
             type="button"
             onClick={addChannel}
@@ -122,19 +121,17 @@ const ChannelsComponent = () => {
           id="channels-box"
           className="nav flex-column nav-pills nav-fill px-2 mb-3 overflow-auto h-100 d-block"
         >
-          {
-            channels.map(channel => (
-              <ChannelItem
-                key={channel.id}
-                handleChannel={handleChannel}
-                channel={channel}
-                currentChannel={currentChannel}
-                remove={removeChannel}
-                rename={renameChannel}
-                t={t}
-              />
-            ))
-          }
+          {channels.map(channel => (
+            <ChannelItem
+              key={channel.id}
+              handleChannel={handleChannel}
+              channel={channel}
+              currentChannel={currentChannel}
+              remove={removeChannel}
+              rename={renameChannel}
+              t={t}
+            />
+          ))}
         </ul>
       </div>
 
@@ -144,11 +141,8 @@ const ChannelsComponent = () => {
             <p className="m-0">
               <b>{`# ${currentChannelName}`}</b>
             </p>
-
             <span className="text-muted">
-              {t('chatPage.chat.message', {
-                count: currentMessages.length,
-              })}
+              {t('chatPage.chat.message', { count: currentMessages.length })}
             </span>
           </div>
 
