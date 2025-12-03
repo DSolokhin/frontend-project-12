@@ -12,7 +12,7 @@ const messagesSlice = createSlice({
     addMessage: messagesAdapter.addOne,
     addMessages: messagesAdapter.addMany,
   },
-  extraReducers: builder => {
+  extraReducers: (builder) => {
     builder.addCase(channelsActions.removeChannel, (state, action) => {
       const { channelId } = action.payload
       const filtered = Object.values(state.entities).filter(
@@ -24,7 +24,9 @@ const messagesSlice = createSlice({
 })
 
 export const { actions } = messagesSlice
+
 export const selectors = messagesAdapter.getSelectors(
   state => state.messages,
 )
+
 export default messagesSlice.reducer
