@@ -36,7 +36,7 @@ const MessagesComponent = () => {
       <Form
         className="py-1 border rounded-2"
         noValidate
-        onSubmit={e => {
+        onSubmit={(e) => {
           e.preventDefault()
           sendMessage()
         }}
