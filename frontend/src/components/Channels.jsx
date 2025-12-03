@@ -16,60 +16,63 @@ const ChannelItem = ({
   remove,
   rename,
   t,
-}) => (
-  <li className="nav-item w-100">
-    {
-      channel.removable
-        ? (
-          <Dropdown as={ButtonGroup} className="d-flex">
-            <Button
-              type="button"
-              variant={channel.id === currentChannel.id ? 'secondary' : null}
-              onClick={() => handleChannel(channel.id)}
-              className="w-100 rounded-0 text-start text-truncate"
-            >
-              <span className="me-1">#</span>
-              {channel.name}
-            </Button>
+}) => {
+  const isCurrent = channel.id === currentChannel.id
 
-            <Dropdown.Toggle
-              split
-              variant={channel.id === currentChannel.id ? 'secondary' : null}
-              id={`dropdown-${channel.id}`}
-            >
-              <span className="visually-hidden">
-                {t('chatPage.channels.control')}
-              </span>
-            </Dropdown.Toggle>
-
-            <Dropdown.Menu>
-              <Dropdown.Item onClick={() => remove(channel.id)}>
-                {t('chatPage.channels.remove')}
-              </Dropdown.Item>
-
-              <Dropdown.Item onClick={() => rename(channel.id)}>
-                {t('chatPage.channels.rename')}
-              </Dropdown.Item>
-            </Dropdown.Menu>
-          </Dropdown>
-        )
-        : (
-          <button
+  if (channel.removable) {
+    return (
+      <li className="nav-item w-100">
+        <Dropdown as={ButtonGroup} className="d-flex">
+          <Button
             type="button"
+            variant={isCurrent ? 'secondary' : null}
             onClick={() => handleChannel(channel.id)}
-            className={cn(
-              'w-100 rounded-0 text-start btn',
-              { 'btn-secondary': channel.id === currentChannel.id },
-            )}
+            className="w-100 rounded-0 text-start text-truncate"
           >
-            <span>#</span>
-            {' '}
+            <span className="me-1">#</span>
             {channel.name}
-          </button>
-        )
-    }
-  </li>
-)
+          </Button>
+
+          <Dropdown.Toggle
+            split
+            variant={isCurrent ? 'secondary' : null}
+            id={`dropdown-${channel.id}`}
+          >
+            <span className="visually-hidden">
+              {t('chatPage.channels.control')}
+            </span>
+          </Dropdown.Toggle>
+
+          <Dropdown.Menu>
+            <Dropdown.Item onClick={() => remove(channel.id)}>
+              {t('chatPage.channels.remove')}
+            </Dropdown.Item>
+            <Dropdown.Item onClick={() => rename(channel.id)}>
+              {t('chatPage.channels.rename')}
+            </Dropdown.Item>
+          </Dropdown.Menu>
+        </Dropdown>
+      </li>
+    )
+  }
+
+  return (
+    <li className="nav-item w-100">
+      <button
+        type="button"
+        onClick={() => handleChannel(channel.id)}
+        className={cn(
+          'w-100 rounded-0 text-start btn',
+          { 'btn-secondary': isCurrent },
+        )}
+      >
+        <span>#</span>
+        {' '}
+        {channel.name}
+      </button>
+    </li>
+  )
+}
 
 const ChannelsComponent = () => {
   const dispatch = useDispatch()
@@ -77,28 +80,28 @@ const ChannelsComponent = () => {
   const currentChannel = useSelector(getCurrentChannel)
   const { t } = useTranslation()
 
-  const handleChannel = id => {
+  const handleChannel = (id) => {
     dispatch(actions.setChannelId(id))
   }
 
   const messagesMass = useSelector(messagesSelect.selectAll)
   const currentMessages = messagesMass.filter(
-    msg => msg.channelId === currentChannel.id,
+    (msg) => msg.channelId === currentChannel.id,
   )
 
   const currentChannelName = channels.find(
-    c => c.id === currentChannel.id,
+    (c) => c.id === currentChannel.id,
   )?.name
 
   const addChannel = () => {
     dispatch(modalAction.openModal({ type: 'add' }))
   }
 
-  const removeChannel = id => {
+  const removeChannel = (id) => {
     dispatch(modalAction.openModal({ type: 'remove', id }))
   }
 
-  const renameChannel = id => {
+  const renameChannel = (id) => {
     dispatch(modalAction.openModal({ type: 'rename', id }))
   }
 
@@ -121,7 +124,7 @@ const ChannelsComponent = () => {
           id="channels-box"
           className="nav flex-column nav-pills nav-fill px-2 mb-3 overflow-auto h-100 d-block"
         >
-          {channels.map(channel => (
+          {channels.map((channel) => (
             <ChannelItem
               key={channel.id}
               handleChannel={handleChannel}
