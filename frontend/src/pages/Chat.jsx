@@ -3,6 +3,7 @@ import { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { ToastContainer, toast } from 'react-toastify'
+
 import { actions as channelsActions } from '../slices/Channels'
 import { actions as messagesActions } from '../slices/Messages'
 import routes from '../routes'
@@ -10,6 +11,7 @@ import HeaderComponent from '../components/Header'
 import ChannelsComponent from '../components/Channels'
 import { useAuth } from '../contexts/authProvider'
 import ModalComponent from '../components/Modal'
+
 import 'react-toastify/dist/ReactToastify.css'
 
 const ChatPage = () => {
