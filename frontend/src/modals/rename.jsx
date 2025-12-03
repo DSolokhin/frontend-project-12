@@ -1,11 +1,11 @@
-import React, { useRef, useEffect, useContext } from 'react';
+import React, { useRef, useEffect, useContext } from 'react'
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import { Button, Form } from 'react-bootstrap';
-import { useTranslation } from 'react-i18next';
-import { useSelector } from 'react-redux';
-import ChatContext from '../contexts/chatContext';
-import { selectors } from '../slices/Channels';
+import { Button, Form } from 'react-bootstrap'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import ChatContext from '../contexts/chatContext'
+import { selectors } from '../slices/Channels'
 
 const validate = (channelsName) => Yup.object().shape({
   channelname: Yup.string()
@@ -16,17 +16,17 @@ const validate = (channelsName) => Yup.object().shape({
 });
 
 const RenameModal = ({ handleClose, toast }) => {
-  const { t } = useTranslation();
-  const inputRef = useRef();
-  const chatContext = useContext(ChatContext);
+  const { t } = useTranslation()
+  const inputRef = useRef()
+  const chatContext = useContext(ChatContext)
   const { renameChannel } = chatContext;
-  const id = useSelector((state) => state.modal.id);
-  const channel = useSelector((state) => selectors.selectById(state, id)).name;
-  const channelsName = useSelector(selectors.selectAll).map((chanel) => chanel.name);
+  const id = useSelector((state) => state.modal.id)
+  const channel = useSelector((state) => selectors.selectById(state, id)).name
+  const channelsName = useSelector(selectors.selectAll).map((chanel) => chanel.name)
 
   useEffect(() => {
-    inputRef.current.focus();
-  }, []);
+    inputRef.current.focus()
+  }, [])
 
   const formik = useFormik({
     initialValues: {
@@ -34,11 +34,11 @@ const RenameModal = ({ handleClose, toast }) => {
     },
     onSubmit: async (values) => {
       try {
-        await renameChannel(id, values.channelname);
-        handleClose();
-        toast(t('toast.channelRename'), 'success');
+        await renameChannel(id, values.channelname)
+        handleClose()
+        toast(t('toast.channelRename'), 'success')
       } catch {
-        toast(t('toast.error'), 'error');
+        toast(t('toast.error'), 'error')
       }
     },
 
@@ -48,7 +48,7 @@ const RenameModal = ({ handleClose, toast }) => {
   });
 
   useEffect(() => {
-    inputRef.current.select();
+    inputRef.current.select()
   }, []);
 
   return (
@@ -96,7 +96,7 @@ const RenameModal = ({ handleClose, toast }) => {
         </div>
       </div>
     </>
-  );
-};
+  )
+}
 
 export default RenameModal;
