@@ -19,12 +19,12 @@ const channelsSlice = createSlice({
 })
 
 const { actions } = channelsSlice
-const selectors = channelsAdapter.getSelectors(state => state.channels)
+const selectors = channelsAdapter.getSelectors((state) => state.channels)
 
-const getCurrentChannel = state => {
+const getCurrentChannel = (state) => {
   const { currentChannelId } = state.channels
   const channelsMass = Object.values(state.channels.entities)
-  return channelsMass.find(channel => channel.id === currentChannelId)
+  return channelsMass.find((channel) => channel.id === currentChannelId)
 }
 
 export { actions, selectors, getCurrentChannel }
