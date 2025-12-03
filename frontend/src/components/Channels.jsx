@@ -86,11 +86,11 @@ const ChannelsComponent = () => {
 
   const messagesMass = useSelector(messagesSelect.selectAll)
   const currentMessages = messagesMass.filter(
-    (msg) => msg.channelId === currentChannel.id,
+    msg => msg.channelId === currentChannel.id,
   )
 
   const currentChannelName = channels.find(
-    (c) => c.id === currentChannel.id,
+    c => c.id === currentChannel.id,
   )?.name
 
   const addChannel = () => {
@@ -124,7 +124,7 @@ const ChannelsComponent = () => {
           id="channels-box"
           className="nav flex-column nav-pills nav-fill px-2 mb-3 overflow-auto h-100 d-block"
         >
-          {channels.map((channel) => (
+          {channels.map(channel => (
             <ChannelItem
               key={channel.id}
               handleChannel={handleChannel}
