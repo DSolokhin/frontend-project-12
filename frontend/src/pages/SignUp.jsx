@@ -36,25 +36,15 @@ const SignUpPage = () => {
     },
     validationSchema: schema,
     validateOnChange: true,
-    onSubmit: async values => {
+    onSubmit: async (values) => {
       try {
         const res = await axios.post(routes.createUserPath(), values)
         auth.logIn(res.data)
         navigate(routes.chat())
-      } catch (err) {
+      }
+      catch {
         formik.setSubmitting(false)
-
-        if (err.isAxiosError && err.response?.status === 409) {
-          setRegFail(true)
-          return
-        }
-
-        if (err.response?.status === 401) {
-          userRef.current?.select()
-          return
-        }
-
-        throw err
+        setRegFail(true)
       }
     },
   })
@@ -65,8 +55,8 @@ const SignUpPage = () => {
 
   const nameInvalid = formik.touched.username && formik.errors.username
   const passInvalid = formik.touched.password && formik.errors.password
-  const confInvalid =
-    formik.touched.confirmpassword && formik.errors.confirmpassword
+  const confInvalid
+    = formik.touched.confirmpassword && formik.errors.confirmpassword
 
   return (
     <div className="d-flex flex-column h-100">
