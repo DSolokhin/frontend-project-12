@@ -36,7 +36,7 @@ const RenameModal = ({ handleClose, toast }) => {
     initialValues: {
       channelname: channel,
     },
-    onSubmit: async values => {
+    onSubmit: async (values) => {
       try {
         await renameChannel(id, values.channelname)
         handleClose()
