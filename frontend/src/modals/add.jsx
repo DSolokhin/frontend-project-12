@@ -1,4 +1,4 @@
-import React, {
+import {
   useRef, useEffect, useContext,
 } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -10,7 +10,7 @@ import LeoProfanity from 'leo-profanity'
 import ChatContext from '../contexts/chatContext'
 import { selectors } from '../slices/Channels'
 
-const getSchema = (channelsName) => Yup.object().shape({
+const getSchema = channelsName => Yup.object().shape({
   channelName: Yup.string()
     .min(3, 'От 3 до 20 символов')
     .max(20, 'От 3 до 20 символов')
@@ -25,7 +25,7 @@ const AddModal = ({ handleClose, toast }) => {
   const { t } = useTranslation()
 
   const channels = useSelector(selectors.selectAll)
-  const channelsName = channels.map((ch) => ch.name)
+  const channelsName = channels.map(ch => ch.name)
 
   useEffect(() => {
     if (inputRef.current) {
@@ -45,7 +45,8 @@ const AddModal = ({ handleClose, toast }) => {
         await createChannel(cleanedName)
         handleClose()
         toast(t('toast.channelAdd'), 'success')
-      } catch {
+      }
+      catch {
         toast(t('toast.error'), 'error')
       }
     },
@@ -83,7 +84,6 @@ const AddModal = ({ handleClose, toast }) => {
               <Form onSubmit={formik.handleSubmit} noValidate>
                 <fieldset disabled={formik.isSubmitting}>
                   <Form.Group className="mb-3">
-
                     <Form.Label htmlFor="channelName">
                       Имя канала
                     </Form.Label>
