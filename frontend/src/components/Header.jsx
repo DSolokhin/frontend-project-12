@@ -17,10 +17,10 @@ const HeaderComponent = () => {
 
         {loggedIn
           ? (
-            <Button onClick={auth.logOut}>
-              {t('header.exit')}
-            </Button>
-          )
+              <Button onClick={auth.logOut}>
+                {t('header.exit')}
+              </Button>
+            )
           : null}
       </div>
     </nav>
