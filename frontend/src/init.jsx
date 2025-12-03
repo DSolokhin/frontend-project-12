@@ -12,7 +12,7 @@ import ru from './locales/ru'
 
 const rollbarConfig = {
   accessToken: import.meta.env.VITE_ROLLBAR_ACCESS_TOKEN,
-  environment: 'production'
+  environment: 'production',
 }
 
 const init = async () => {
@@ -21,7 +21,7 @@ const init = async () => {
   const i18n = i18next.createInstance()
   await i18n.use(initReactI18next).init({
     resources: { ru },
-    fallbackLng: 'ru'
+    fallbackLng: 'ru',
   })
 
   const socket = io()

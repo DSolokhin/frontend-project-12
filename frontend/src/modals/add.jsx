@@ -1,4 +1,4 @@
-import React, {
+import {
   useRef, useEffect, useContext,
 } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -10,7 +10,7 @@ import LeoProfanity from 'leo-profanity'
 import ChatContext from '../contexts/chatContext'
 import { selectors } from '../slices/Channels'
 
-const getSchema = (channelsName) => Yup.object().shape({
+const getSchema = channelsName => Yup.object().shape({
   channelName: Yup.string()
     .min(3, 'От 3 до 20 символов')
     .max(20, 'От 3 до 20 символов')
@@ -25,12 +25,10 @@ const AddModal = ({ handleClose, toast }) => {
   const { t } = useTranslation()
 
   const channels = useSelector(selectors.selectAll)
-  const channelsName = channels.map((ch) => ch.name)
+  const channelsName = channels.map(ch => ch.name)
 
   useEffect(() => {
-    if (inputRef.current) {
-      inputRef.current.focus()
-    }
+    inputRef.current?.focus()
   }, [])
 
   const formik = useFormik({
@@ -39,10 +37,10 @@ const AddModal = ({ handleClose, toast }) => {
     },
     validationSchema: getSchema(channelsName),
     validateOnChange: false,
-    onSubmit: async ({ channelName }) => {
+    onSubmit: async values => {
       try {
-        const cleanedName = LeoProfanity.clean(channelName)
-        await createChannel(cleanedName)
+        const cleaned = LeoProfanity.clean(values.channelName)
+        await createChannel(cleaned)
         handleClose()
         toast(t('toast.channelAdd'), 'success')
       } catch {
@@ -51,7 +49,7 @@ const AddModal = ({ handleClose, toast }) => {
     },
   })
 
-  const hasError = formik.touched.channelName && !!formik.errors.channelName
+  const isInvalid = formik.touched.channelName && !!formik.errors.channelName
 
   return (
     <>
@@ -75,30 +73,29 @@ const AddModal = ({ handleClose, toast }) => {
                 type="button"
                 aria-label="Close"
                 className="btn btn-close"
-                onClick={handleClose}
+                onClick={() => handleClose()}
               />
             </div>
 
             <div className="modal-body">
-              <Form onSubmit={formik.handleSubmit} noValidate>
+              <Form noValidate onSubmit={formik.handleSubmit}>
                 <fieldset disabled={formik.isSubmitting}>
                   <Form.Group className="mb-3">
-                    {/* ВАЖНО: именно этот label видит Playwright */}
                     <Form.Label htmlFor="channelName">
-                      Имя канала
+                      {t('chatPage.channels.name')}
                     </Form.Label>
 
                     <Form.Control
                       id="channelName"
                       name="channelName"
-                      aria-label="Имя канала"
-                      autoComplete="off"
+                      aria-label={t('chatPage.channels.name')}
                       className="mb-2"
-                      ref={inputRef}
+                      autoComplete="off"
                       value={formik.values.channelName}
                       onChange={formik.handleChange}
                       onBlur={formik.handleBlur}
-                      isInvalid={hasError}
+                      isInvalid={isInvalid}
+                      ref={inputRef}
                     />
 
                     <Form.Control.Feedback type="invalid">
@@ -110,17 +107,13 @@ const AddModal = ({ handleClose, toast }) => {
                     <Button
                       type="button"
                       variant="secondary"
+                      onClick={() => handleClose()}
                       className="me-2"
-                      onClick={handleClose}
-                      disabled={formik.isSubmitting}
                     >
                       {t('modal.cancel')}
                     </Button>
-                    <Button
-                      type="submit"
-                      variant="primary"
-                      disabled={formik.isSubmitting}
-                    >
+
+                    <Button type="submit" variant="primary">
                       {t('modal.send')}
                     </Button>
                   </div>

@@ -6,10 +6,11 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 const renderApp = async () => {
   const root = ReactDOM.createRoot(document.getElementById('chat'))
   const vdom = await init()
+
   root.render(
     <React.StrictMode>
       {vdom}
-    </React.StrictMode>
+    </React.StrictMode>,
   )
 }
 

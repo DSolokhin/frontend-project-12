@@ -17,17 +17,20 @@ const RenderMessageComponent = () => {
     messageRef.current.scrollIntoView({
       behavior: 'smooth',
     })
-  }, [currentMessages.length])
+  }, [currentMessages])
 
   return (
     <div id="messages-box" className="chat-messages overflow-auto px-5">
-      {currentMessages.map(msg => (
-        <div key={msg.id} className="text-break mb-2">
-          <b>{msg.username}</b>
-          {`: ${LeoProfanity.clean(msg.body)}`}
-        </div>
-      ))}
-
+      {
+        currentMessages.map(msg => (
+          <div key={msg.id} className="text-break mb-2">
+            <b>{msg.username}</b>
+            :
+            {' '}
+            {LeoProfanity.clean(msg.body)}
+          </div>
+        ))
+      }
       <span ref={messageRef} />
     </div>
   )

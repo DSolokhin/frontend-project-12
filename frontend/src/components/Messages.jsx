@@ -36,18 +36,19 @@ const MessagesComponent = () => {
       <Form
         className="py-1 border rounded-2"
         noValidate
-        onSubmit={(e) => {
+        onSubmit={e => {
           e.preventDefault()
           sendMessage()
         }}
       >
         <InputGroup className="has-validation">
+
           <Form.Control
             name="body"
-            placeholder="Введите сообщение..."
+            placeholder={t('placeholder.inputHolder')}
             value={text}
-            onChange={(e) => setText(e.target.value)}
-            aria-label="Новое сообщение"
+            onChange={e => setText(e.target.value)}
+            aria-label={t('placeholder.renderMessage')}
             className="border-0 p-0 ps-2"
             noValidate
             ref={ref}
@@ -59,10 +60,12 @@ const MessagesComponent = () => {
             disabled={text === ''}
           >
             <ArrowRightSquare width="20" height="20" />
+
             <span className="visually-hidden">
               {t('chatPage.chat.send')}
             </span>
           </Button>
+
         </InputGroup>
       </Form>
     </div>
